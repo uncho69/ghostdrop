@@ -62,7 +62,7 @@ export default async function handler(
     }
 
     // Parse and update failed attempts
-    const dropData: EncryptedDropData = JSON.parse(rawData);
+    const dropData: EncryptedDropData = JSON.parse(rawData as string);
     dropData.failedAttempts = (dropData.failedAttempts || 0) + 1;
 
     // 🚨 Auto-delete if too many failed attempts
@@ -80,7 +80,7 @@ export default async function handler(
     // Update drop data with failed attempt count, preserve TTL
     const ttl = await redis.ttl(key);
     if (ttl > 0) {
-      await redis.setEx(key, ttl, JSON.stringify(dropData));
+      await redis.setex(key, ttl, JSON.stringify(dropData));
     }
 
     console.log(`⚠️ Failed decryption attempt ${dropData.failedAttempts}/${MAX_FAILED_ATTEMPTS} for drop ${id}`);
