@@ -1,8 +1,8 @@
 import { Redis } from '@upstash/redis'
 
 // 🔒 SECURE REDIS CONFIGURATION - Upstash Redis Client
-// 🚀 FORCE DEPLOY: Secure environment variables v5
-// 🔥 CACHE BUSTER: 2025-06-15T22:00:00Z - Force complete rebuild
+// 🚀 FORCE DEPLOY: Secure environment variables v6 - FIXED JSON PARSING
+// 🔥 CACHE BUSTER: 2025-06-15T22:15:00Z - Force complete rebuild with JSON fix
 let redisClient: Redis | null = null;
 
 // 🛡️ Secure logging configuration
