@@ -2,6 +2,8 @@ import { getRedisClient } from './redis';
 
 // Generate a single-use code on demand
 export async function generateSingleUseCode(): Promise<string> {
+  console.log('🎲 generateSingleUseCode: Starting...');
+  
   const prefixes = ['GHOST', 'PHANTOM', 'SHADOW', 'CIPHER', 'WRAITH', 'SPECTER', 'ENIGMA', 'VORTEX', 'NEXUS', 'MATRIX', 'QUANTUM'];
   const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
   const randomNum = Math.floor(Math.random() * 9) + 1; // 1-9
@@ -9,27 +11,42 @@ export async function generateSingleUseCode(): Promise<string> {
   const randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
   const code = `${prefix}${randomNum}${randomChars}${randomLetter}`;
   
+  console.log('🎯 Generated code pattern:', code);
+  
   try {
+    console.log('🔌 Attempting Redis connection...');
     const redis = await getRedisClient();
+    console.log('✅ Redis client obtained');
     
+    console.log('💾 Storing code metadata...');
     // Store code as active with metadata
     await redis.hSet(`access_code:${code}`, {
       status: 'active',
       created: Date.now().toString(),
       used: 'false'
     });
+    console.log('✅ Code metadata stored');
     
+    console.log('📝 Adding to active codes list...');
     // Add to active codes list
     await redis.sAdd('active_codes', code);
+    console.log('✅ Added to active codes list');
     
+    console.log('📊 Incrementing counter...');
     // Increment total generated counter
     await redis.incr('total_codes_generated');
+    console.log('✅ Counter incremented');
     
     console.log(`✅ Generated single-use code: ${code}`);
     return code;
   } catch (error) {
-    console.error('Error storing code in Redis:', error);
-    throw new Error('Failed to generate code');
+    console.error('💥 DETAILED ERROR in generateSingleUseCode:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      redisUrl: process.env.REDIS_URL ? 'SET' : 'MISSING'
+    });
+    throw new Error(`Failed to generate code: ${error.message}`);
   }
 }
 

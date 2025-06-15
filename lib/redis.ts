@@ -1,35 +1,61 @@
 import { createClient } from 'redis';
 
-// Configurazione Redis per Vercel Serverless
+// Configurazione Redis per Vercel Serverless con TLS
 let redis: any = null;
 
 export async function getRedisClient() {
+  console.log('🔗 getRedisClient: Starting...');
+  
   if (!redis) {
+    console.log('🆕 Creating new Redis client...');
+    console.log('📍 Redis URL:', process.env.REDIS_URL ? 'SET' : 'MISSING');
+    
+    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    
     redis = createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
+      url: redisUrl,
       socket: {
         connectTimeout: 10000,
+        // Abilita TLS per Upstash Redis
+        tls: redisUrl.includes('upstash.io'),
+        rejectUnauthorized: false
       },
     });
 
     redis.on('error', (err: any) => {
-      console.error('Redis Client Error:', err);
+      console.error('💥 Redis Client Error:', err);
     });
 
     redis.on('connect', () => {
       console.log('✅ Redis connected');
     });
+    
+    redis.on('ready', () => {
+      console.log('🚀 Redis ready');
+    });
+    
+    redis.on('end', () => {
+      console.log('🔚 Redis connection ended');
+    });
   }
 
   if (!redis.isOpen) {
     try {
+      console.log('🔌 Connecting to Redis...');
       await redis.connect();
+      console.log('✅ Redis connection established');
     } catch (error) {
-      console.error('Failed to connect to Redis:', error);
-      throw new Error('Redis connection failed');
+      console.error('💥 DETAILED Redis connection error:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        redisUrl: process.env.REDIS_URL ? 'SET' : 'MISSING'
+      });
+      throw new Error(`Redis connection failed: ${error.message}`);
     }
   }
 
+  console.log('🎯 Returning Redis client');
   return redis;
 }
 
