@@ -6,6 +6,7 @@
 
 ## 🔥 Features
 
+- **📁 Messages/Files Encrypted**: Support for both text messages and file uploads with full encryption
 - **🔐 Zero-Knowledge Encryption**: AES-256-GCM encryption happens entirely in your browser
 - **💥 Auto-Destruction**: Messages self-destruct after first view or 24h expiry
 - **⏱️ Burn After Reading**: Customizable timers with visual countdown (instant, 5s, 30s, 1 minute)
@@ -130,4 +131,6 @@ This software is provided "as is" without warranty. Users assume all responsibil
 
 ---
 
-**Built with ❤️ for privacy and security** 
+**Built with ❤️ for privacy and security**
+
+*Last updated: Force sync with Vercel - Redis TLS fix deployed* 

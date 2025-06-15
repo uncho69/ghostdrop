@@ -1,34 +1,81 @@
 import { createClient } from 'redis';
 
-// Configurazione Redis per Vercel Serverless con TLS
+// 🔒 SECURE REDIS CONFIGURATION - No hardcoded credentials
 let redis: any = null;
 
+// 🛡️ Secure logging configuration
+const ENABLE_REDIS_LOGS = process.env.ENABLE_REDIS_LOGS === 'true';
+
+function secureLog(message: string, data?: any) {
+  if (ENABLE_REDIS_LOGS) {
+    if (data) {
+      console.log(message, data);
+    } else {
+      console.log(message);
+    }
+  }
+}
+
 export async function getRedisClient() {
-  console.log('🔗 getRedisClient: Starting...');
+  secureLog('🔗 getRedisClient: Starting...');
   
   if (!redis) {
-    console.log('🆕 Creating new Redis client...');
-    console.log('📍 Redis URL:', process.env.REDIS_URL ? 'SET' : 'MISSING');
+    secureLog('🆕 Creating new Redis client...');
     
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const redisUrl = process.env.REDIS_URL;
+    const redisHost = process.env.REDIS_HOST;
+    const redisPort = process.env.REDIS_PORT;
+    const redisPassword = process.env.REDIS_PASSWORD;
+    const redisUsername = process.env.REDIS_USERNAME || 'default';
     
-    // Configurazione per Upstash Redis con credenziali separate
-    if (redisUrl.includes('upstash.io')) {
-      console.log('🔧 Using Upstash configuration...');
+    if (!redisUrl && !redisHost) {
+      throw new Error('Redis configuration missing: REDIS_URL or REDIS_HOST required');
+    }
+    
+    // 🔧 Upstash Redis configuration (secure)
+    if (redisUrl && redisUrl.includes('upstash.io')) {
+      secureLog('🔧 Using Upstash configuration...');
+      
+      if (!redisPassword) {
+        throw new Error('REDIS_PASSWORD required for Upstash configuration');
+      }
+      
+      // Extract host from URL for Upstash
+      const urlMatch = redisUrl.match(/redis:\/\/[^@]*@([^:]+):(\d+)/);
+      if (!urlMatch) {
+        throw new Error('Invalid Upstash Redis URL format');
+      }
+      
       redis = createClient({
         socket: {
-          host: 'beloved-boa-34450.upstash.io',
-          port: 6379,
+          host: urlMatch[1],
+          port: parseInt(urlMatch[2]),
           tls: true,
           rejectUnauthorized: false
         },
-        username: 'default',
-        password: 'AYaSAAIjcDFhMDgzZDgwYWJiMjk0ODIzOGQyY2YwYTQ3NmM5ZDQ1NHAxMA'
+        username: redisUsername,
+        password: redisPassword
       });
-    } else {
-      // Configurazione locale
+    } 
+    // 🏠 Local or custom Redis configuration
+    else if (redisHost && redisPort && redisPassword) {
+      secureLog('🏠 Using custom host/port configuration...');
       redis = createClient({
-        url: redisUrl,
+        socket: {
+          host: redisHost,
+          port: parseInt(redisPort),
+          tls: redisHost.includes('upstash.io') || redisHost.includes('redis.cloud'),
+          connectTimeout: 10000,
+        },
+        username: redisUsername,
+        password: redisPassword
+      });
+    }
+    // 📍 Fallback to URL configuration
+    else {
+      secureLog('📍 Using URL configuration...');
+      redis = createClient({
+        url: redisUrl || 'redis://localhost:6379',
         socket: {
           connectTimeout: 10000,
         },
@@ -36,54 +83,48 @@ export async function getRedisClient() {
     }
 
     redis.on('error', (err: any) => {
-      console.error('💥 Redis Client Error:', err);
+      console.error('💥 Redis Client Error:', err.message); // Only log error message, not full details
     });
 
     redis.on('connect', () => {
-      console.log('✅ Redis connected');
+      secureLog('✅ Redis connected');
     });
     
     redis.on('ready', () => {
-      console.log('🚀 Redis ready');
+      secureLog('🚀 Redis ready');
     });
     
     redis.on('end', () => {
-      console.log('🔚 Redis connection ended');
+      secureLog('🔚 Redis connection ended');
     });
   }
 
   if (!redis.isOpen) {
     try {
-      console.log('🔌 Connecting to Redis...');
+      secureLog('🔌 Connecting to Redis...');
       await redis.connect();
-      console.log('✅ Redis connection established');
+      secureLog('✅ Redis connection established');
     } catch (error) {
-      console.error('💥 DETAILED Redis connection error:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-        redisUrl: process.env.REDIS_URL ? 'SET' : 'MISSING'
-      });
+      console.error('💥 Redis connection failed:', error.message); // Only log error message
       throw new Error(`Redis connection failed: ${error.message}`);
     }
   }
 
-  console.log('🎯 Returning Redis client');
+  secureLog('🎯 Returning Redis client');
   return redis;
 }
 
-// Utility per generare UUID sicuri
+// 🔐 Cryptographically secure ID generation
 export function generateSecureId(): string {
-  // Genera un ID sicuro usando crypto random
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
   const randomArray = new Uint8Array(32);
   
-  // Usa crypto.getRandomValues per sicurezza
+  // Use crypto.getRandomValues for security
   if (typeof window !== 'undefined' && window.crypto) {
     window.crypto.getRandomValues(randomArray);
   } else {
-    // Server-side fallback
+    // Server-side secure random
     const crypto = require('crypto');
     crypto.randomFillSync(randomArray);
   }
@@ -95,9 +136,30 @@ export function generateSecureId(): string {
   return result;
 }
 
-// Chiave Redis standardizzata
+// 🔑 Standardized Redis key
 export function getDropKey(id: string): string {
   return `drop:${id}`;
+}
+
+// 🛡️ Rate limiting helper
+export async function checkRateLimit(key: string, maxAttempts: number = 5, windowSeconds: number = 300): Promise<{ allowed: boolean; remaining: number }> {
+  try {
+    const redis = await getRedisClient();
+    const current = await redis.incr(key);
+    
+    if (current === 1) {
+      await redis.expire(key, windowSeconds);
+    }
+    
+    const remaining = Math.max(0, maxAttempts - current);
+    return {
+      allowed: current <= maxAttempts,
+      remaining
+    };
+  } catch (error) {
+    // Fail open for rate limiting to avoid blocking legitimate users
+    return { allowed: true, remaining: maxAttempts };
+  }
 }
 
 export default redis; 

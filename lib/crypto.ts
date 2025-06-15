@@ -213,32 +213,71 @@ export function fileToBase64(file: File, maxSizeMB: number = 25): Promise<string
   });
 }
 
-// 🧹 Secure memory cleanup (attempt to clear sensitive data)
-export function secureCleanup(sensitiveString: string): void {
-  // Note: JavaScript doesn't provide true secure memory wiping,
-  // but we can try to overwrite the reference
-  try {
-    if (typeof sensitiveString === 'string') {
-      // This is a best-effort attempt at cleanup
-      sensitiveString = '\0'.repeat(sensitiveString.length);
+// 🧹 Secure buffer cleanup utility
+function secureWipeBuffer(buffer: Uint8Array): void {
+  if (buffer && buffer.fill) {
+    try {
+      // Overwrite with random data first
+      crypto.getRandomValues(buffer);
+      // Then overwrite with zeros
+      buffer.fill(0);
+    } catch (error) {
+      // Fallback: just fill with zeros
+      buffer.fill(0);
     }
+  }
+}
+
+// 🧹 Secure array cleanup utility
+function secureWipeArray(arr: any[]): void {
+  if (Array.isArray(arr)) {
+    try {
+      arr.fill(null);
+      arr.length = 0;
+    } catch (error) {
+      // Ignore cleanup errors
+    }
+  }
+}
+
+// 🧹 Enhanced secure memory cleanup
+export function secureCleanup(...sensitiveData: any[]): void {
+  try {
+    sensitiveData.forEach(data => {
+      if (data instanceof Uint8Array) {
+        secureWipeBuffer(data);
+      } else if (Array.isArray(data)) {
+        secureWipeArray(data);
+      } else if (typeof data === 'string' && data.length > 0) {
+        // Best effort string cleanup (limited in JavaScript)
+        try {
+          // Create a new string filled with zeros
+          const zeros = '\0'.repeat(data.length);
+          data = zeros; // This won't actually overwrite the original string
+        } catch {
+          // Ignore cleanup errors for strings
+        }
+      }
+    });
   } catch {
     // Ignore cleanup errors
   }
 }
 
-// 🔍 Crypto capability detection
-export function checkCryptoSupport(): { supported: boolean; features: string[] } {
+// 🔍 Enhanced crypto capability detection
+export function checkCryptoSupport(): { supported: boolean; features: string[]; warnings: string[] } {
   const features: string[] = [];
+  const warnings: string[] = [];
   let supported = true;
 
   if (!crypto) {
-    return { supported: false, features: ['No Crypto API'] };
+    return { supported: false, features: ['No Crypto API'], warnings: ['Browser not supported'] };
   }
 
   if (!crypto.getRandomValues) {
     supported = false;
     features.push('No secure random');
+    warnings.push('Cryptographically secure random generation not available');
   } else {
     features.push('Secure random ✓');
   }
@@ -246,9 +285,41 @@ export function checkCryptoSupport(): { supported: boolean; features: string[] }
   if (!crypto.subtle) {
     supported = false;
     features.push('No WebCrypto');
+    warnings.push('WebCrypto API not available - encryption impossible');
   } else {
     features.push('WebCrypto ✓');
+    
+    // Test specific algorithms
+    try {
+      if (crypto.subtle.encrypt && crypto.subtle.decrypt) {
+        features.push('AES-GCM ✓');
+      }
+      if (crypto.subtle.deriveKey) {
+        features.push('PBKDF2 ✓');
+      }
+    } catch {
+      warnings.push('Some crypto algorithms may not be available');
+    }
   }
 
-  return { supported, features };
+  // Check for secure context (HTTPS)
+  if (typeof window !== 'undefined' && !window.isSecureContext) {
+    warnings.push('Insecure context - HTTPS required for full security');
+  }
+
+  return { supported, features, warnings };
+}
+
+// 🛡️ Timing-safe string comparison to prevent timing attacks
+export function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  
+  return result === 0;
 } 

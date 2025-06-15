@@ -91,10 +91,29 @@ export default function ViewDrop() {
         };
 
         // 🔓 CRITICAL: Decrypt data client-side
-        const decryptedJson = await decryptData(encryptedData, encryptionKey);
-        const dropData: DropData = JSON.parse(decryptedJson);
-
-        console.log('✅ Decryption successful!');
+        let decryptedJson: string;
+        let dropData: DropData;
+        
+        try {
+          decryptedJson = await decryptData(encryptedData, encryptionKey);
+          dropData = JSON.parse(decryptedJson);
+          console.log('✅ Decryption successful!');
+        } catch (decryptError) {
+          // 🚨 Report failed decryption attempt to server
+          try {
+            await fetch('/api/report-failed-decrypt', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ id })
+            });
+          } catch (reportError) {
+            console.warn('Failed to report decryption failure:', reportError);
+          }
+          
+          throw new Error('Decryption failed - invalid key or corrupted data');
+        }
         
         // 🔐 NEW: Check if password protection is enabled
         if (dropData.password) {

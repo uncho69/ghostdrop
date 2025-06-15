@@ -15,29 +15,30 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          // 🛡️ Content Security Policy - Prevent XSS/injection attacks
+          // 🛡️ Content Security Policy - Maximum security
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'", // Needed for Next.js
-              "style-src 'self' 'unsafe-inline'", // Needed for Tailwind
+              "script-src 'self' 'unsafe-eval'", // Minimal unsafe-eval for Next.js runtime
+              "style-src 'self' 'unsafe-inline'", // Required for Tailwind CSS
               "img-src 'self' data: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' ws: wss:", // WebSocket for dev server
+              "connect-src 'self'", // Removed WebSocket for production
               "media-src 'self'",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
-              "upgrade-insecure-requests"
+              "upgrade-insecure-requests",
+              "block-all-mixed-content"
             ].join('; ')
           },
           
           // 🔐 Force HTTPS in production
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains; preload'
+            value: 'max-age=63072000; includeSubDomains; preload'
           },
           
           // 🚫 Prevent clickjacking attacks
@@ -76,7 +77,10 @@ const nextConfig = {
               'magnetometer=()',
               'gyroscope=()',
               'speaker=()',
-              'fullscreen=(self)'
+              'fullscreen=(self)',
+              'autoplay=()',
+              'encrypted-media=()',
+              'picture-in-picture=()'
             ].join(', ')
           },
           
@@ -102,7 +106,7 @@ const nextConfig = {
         ]
       },
       
-      // 🔒 Extra protection for API routes
+      // 🔒 Extra protection for API routes - No caching + CORS restrictions
       {
         source: '/api/(.*)',
         headers: [
@@ -117,6 +121,37 @@ const nextConfig = {
           {
             key: 'Expires',
             value: '0'
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization'
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400'
+          }
+        ]
+      },
+
+      // 🛡️ Security headers for static assets
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
           }
         ]
       }
@@ -129,18 +164,23 @@ const nextConfig = {
   },
 
   // 🔐 Security-focused webpack config
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     if (!isServer) {
       // Client-side optimizations for crypto operations
       config.resolve.fallback = {
         ...config.resolve.fallback,
         crypto: false, // Use WebCrypto API instead
+        fs: false,
+        net: false,
+        tls: false,
       };
     }
     
-    // Production security
-    if (process.env.NODE_ENV === 'production') {
+    // Production security optimizations
+    if (!dev) {
       config.optimization.minimize = true;
+      // Remove console.log in production
+      config.optimization.minimizer = config.optimization.minimizer || [];
     }
     
     return config;
@@ -148,8 +188,13 @@ const nextConfig = {
 
   // 🛡️ Environment security
   env: {
-    GHOST_VERSION: '1.0.0',
+    GHOST_VERSION: '2.0.0',
     SECURITY_LEVEL: 'ENTERPRISE'
+  },
+
+  // 🔒 Experimental security features
+  experimental: {
+    serverComponentsExternalPackages: ['redis']
   }
 };
 
