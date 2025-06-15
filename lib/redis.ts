@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 
 // 🔒 SECURE REDIS CONFIGURATION - No hardcoded credentials
+// 🚀 FORCE DEPLOY: Fixed Upstash URL configuration
 let redis: any = null;
 
 // 🛡️ Secure logging configuration
