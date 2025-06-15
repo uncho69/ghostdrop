@@ -2,7 +2,7 @@
 
 **Secure, ephemeral file & message sharing with zero-knowledge encryption**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/huncho69/ghostdrop)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/uncho69/ghostdrop)
 
 ## 🔥 Features
 
@@ -43,7 +43,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/huncho69/ghostdrop.git
+   git clone https://github.com/uncho69/ghostdrop.git
    cd ghostdrop
    ```
 
