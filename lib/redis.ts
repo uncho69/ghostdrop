@@ -12,15 +12,28 @@ export async function getRedisClient() {
     
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
     
-    redis = createClient({
-      url: redisUrl,
-      socket: {
-        connectTimeout: 10000,
-        // Abilita TLS per Upstash Redis
-        tls: redisUrl.includes('upstash.io'),
-        rejectUnauthorized: false
-      },
-    });
+    // Configurazione per Upstash Redis con credenziali separate
+    if (redisUrl.includes('upstash.io')) {
+      console.log('🔧 Using Upstash configuration...');
+      redis = createClient({
+        socket: {
+          host: 'beloved-boa-34450.upstash.io',
+          port: 6379,
+          tls: true,
+          rejectUnauthorized: false
+        },
+        username: 'default',
+        password: 'AYaSAAIjcDFhMDgzZDgwYWJiMjk0ODIzOGQyY2YwYTQ3NmM5ZDQ1NHAxMA'
+      });
+    } else {
+      // Configurazione locale
+      redis = createClient({
+        url: redisUrl,
+        socket: {
+          connectTimeout: 10000,
+        },
+      });
+    }
 
     redis.on('error', (err: any) => {
       console.error('💥 Redis Client Error:', err);
