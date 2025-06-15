@@ -34,12 +34,13 @@ export async function getRedisClient() {
       throw new Error('Redis configuration missing: REDIS_URL or REDIS_HOST required');
     }
     
-    // 🔧 Upstash Redis configuration (secure)
+    // 🔧 COMPLETELY NEW UPSTASH LOGIC - Use URL directly
     if (redisUrl && redisUrl.includes('upstash.io')) {
-      secureLog('🔧 Using Upstash configuration with full URL...');
+      secureLog('🔧 Using Upstash with direct URL connection...');
       
+      // DIRECT URL CONNECTION - NO SEPARATE PASSWORD NEEDED
       redis = createClient({
-        url: redisUrl,
+        url: redisUrl, // This contains everything: redis://user:pass@host:port
         socket: {
           tls: true,
           rejectUnauthorized: false,
