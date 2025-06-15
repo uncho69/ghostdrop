@@ -61,8 +61,23 @@ export default async function handler(
       });
     }
 
-    // Parse encrypted drop data
-    const dropData: EncryptedDropData = JSON.parse(rawData as string);
+    // Parse encrypted drop data - handle Upstash Redis format
+    let dropData: EncryptedDropData;
+    try {
+      // If rawData is already an object (Upstash returns parsed JSON)
+      if (typeof rawData === 'object' && rawData !== null) {
+        dropData = rawData as EncryptedDropData;
+      } else {
+        // If it's a string, parse it
+        dropData = JSON.parse(rawData as string);
+      }
+    } catch (parseError) {
+      console.error('❌ JSON parse error:', parseError.message, 'Raw data type:', typeof rawData);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Data corruption detected' 
+      });
+    }
 
     // 🛡️ Check if drop has too many failed attempts
     if (dropData.failedAttempts && dropData.failedAttempts >= MAX_FAILED_ATTEMPTS) {
