@@ -133,19 +133,17 @@ export default async function handler(
       ...(burnTimer && typeof burnTimer === 'number' && burnTimer > 0 && { burnTimer })
     };
 
-    // 🔥 Calculate TTL: use burnTimer if provided, otherwise default 24h
+    // 🔥 TTL is always 24h - burn timer is handled client-side only
     let ttl = DEFAULT_TTL;
-    if (burnTimer && burnTimer > 0) {
-      // Use the shorter of burnTimer or default TTL for security
-      ttl = Math.min(burnTimer, DEFAULT_TTL);
-    }
+    // Note: burnTimer is stored in data but doesn't affect Redis TTL
+    // The burn timer starts only when the drop is viewed, not when created
 
     // Save to Redis with calculated TTL
     const redis = getRedisClient();
     await redis.setex(key, ttl, JSON.stringify(dropData));
 
     const ttlHours = Math.round(ttl / 3600 * 10) / 10; // Round to 1 decimal
-    console.log(`✅ Drop created: ${id} (expires in ${ttlHours}h, 1 view max${burnTimer ? `, burn timer: ${burnTimer}s` : ''})`);
+    console.log(`✅ Drop created: ${id} (expires in ${ttlHours}h, 1 view max${burnTimer ? `, client burn timer: ${burnTimer}s` : ''})`);
 
     // Clean response - only the ID and metadata
     res.status(200).json({ 

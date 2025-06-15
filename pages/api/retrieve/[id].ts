@@ -12,10 +12,10 @@ interface EncryptedDropData {
   failedAttempts?: number; // 🛡️ Track failed decryption attempts
 }
 
-// 🛡️ Security constants
+// 🛡️ Security constants - More reasonable limits for Vercel
 const MAX_FAILED_ATTEMPTS = 3;
-const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW_SECONDS || '300');
-const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX_ATTEMPTS || '5');
+const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW_SECONDS || '60'); // 1 minuto invece di 5
+const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX_ATTEMPTS || '20'); // 20 tentativi invece di 5
 
 export default async function handler(
   req: NextApiRequest,
