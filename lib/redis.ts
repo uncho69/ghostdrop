@@ -2,6 +2,7 @@ import { createClient } from 'redis';
 
 // 🔒 SECURE REDIS CONFIGURATION - No hardcoded credentials
 // 🚀 FORCE DEPLOY: Fixed Upstash URL configuration
+// 🔥 CACHE BUSTER: 2025-06-15T18:35:00Z - Force complete rebuild
 let redis: any = null;
 
 // 🛡️ Secure logging configuration
