@@ -76,8 +76,8 @@ export default async function handler(
     };
 
     // Salva in Redis con TTL di 24 ore
-    const redis = await getRedisClient();
-    await redis.setEx(key, 86400, JSON.stringify(dropData)); // 24 ore
+    const redis = getRedisClient();
+    await redis.setex(key, 86400, JSON.stringify(dropData)); // 24 ore
 
     // Genera URL con hash per la chiave di crittografia
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
