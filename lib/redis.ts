@@ -34,27 +34,15 @@ export async function getRedisClient() {
     
     // 🔧 Upstash Redis configuration (secure)
     if (redisUrl && redisUrl.includes('upstash.io')) {
-      secureLog('🔧 Using Upstash configuration...');
-      
-      if (!redisPassword) {
-        throw new Error('REDIS_PASSWORD required for Upstash configuration');
-      }
-      
-      // Extract host from URL for Upstash
-      const urlMatch = redisUrl.match(/redis:\/\/[^@]*@([^:]+):(\d+)/);
-      if (!urlMatch) {
-        throw new Error('Invalid Upstash Redis URL format');
-      }
+      secureLog('🔧 Using Upstash configuration with full URL...');
       
       redis = createClient({
+        url: redisUrl,
         socket: {
-          host: urlMatch[1],
-          port: parseInt(urlMatch[2]),
           tls: true,
-          rejectUnauthorized: false
-        },
-        username: redisUsername,
-        password: redisPassword
+          rejectUnauthorized: false,
+          connectTimeout: 10000,
+        }
       });
     } 
     // 🏠 Local or custom Redis configuration
