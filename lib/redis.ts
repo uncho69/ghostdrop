@@ -1,8 +1,8 @@
 import { Redis } from '@upstash/redis'
 
 // 🔒 SECURE REDIS CONFIGURATION - Upstash Redis Client
-// 🚀 FORCE DEPLOY: Complete rewrite for Upstash v3
-// 🔥 CACHE BUSTER: 2025-06-15T20:00:00Z - Force complete rebuild
+// 🚀 FORCE DEPLOY: Complete rewrite for Upstash v4
+// 🔥 CACHE BUSTER: 2025-06-15T21:00:00Z - Force complete rebuild
 let redisClient: Redis | null = null;
 
 // 🛡️ Secure logging configuration
@@ -29,52 +29,32 @@ export function getRedisClient(): Redis {
   }
 
   try {
-    // Parse the Redis URL: redis://default:password@host:port
-    const url = new URL(redisUrl);
-    const password = url.password;
-    const hostname = url.hostname;
-    const port = url.port || '6379';
-
-    if (!password) {
-      throw new Error('Password not found in REDIS_URL');
-    }
-
-    if (!hostname) {
-      throw new Error('Hostname not found in REDIS_URL');
-    }
-
-    // For Upstash, we need HTTPS URL and the password as token
-    const upstashUrl = `https://${hostname}:${port}`;
-    
-    secureLog('🔌 Configuring Upstash Redis client', {
-      url: upstashUrl,
-      hasToken: !!password,
-      hostname,
-      port
-    });
+    // Configurazione Upstash con URL e token
+    const token = 'AYaSAAIjcDFhMDgzZDgwYWJiMjk0ODIzOGQyY2YwYTQ3NmM5ZDQ1NHAxMA';
+    const url = 'https://beloved-boa-34450.upstash.io';
 
     redisClient = new Redis({
-      url: upstashUrl,
-      token: password
+      url: url,
+      token: token,
     });
 
-    secureLog('✅ Upstash Redis client configured successfully');
+    secureLog('✅ Redis connected');
     return redisClient;
-
   } catch (error) {
-    console.error('❌ Redis configuration error:', error);
-    throw new Error(`Failed to configure Redis: ${error.message}`);
+    secureLog('❌ Redis connection failed:', error);
+    throw new Error(`Failed to connect to Redis: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
+// Test connection function
 export async function testRedisConnection(): Promise<boolean> {
   try {
-    const client = getRedisClient();
-    await client.ping();
-    console.log('✅ Redis connected');
+    const redis = getRedisClient();
+    await redis.ping();
+    secureLog('✅ Redis ping successful');
     return true;
   } catch (error) {
-    console.error('❌ Redis connection error:', error);
+    secureLog('❌ Redis ping failed:', error);
     return false;
   }
 }
