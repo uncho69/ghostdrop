@@ -1,39 +1,35 @@
 import { createClient } from 'redis';
 
-// Configurazione Redis sicura
-const redis = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
-  socket: {
-    connectTimeout: 5000,
-  },
-});
-
-// Gestione errori Redis
-redis.on('error', (err) => {
-  console.error('Redis Client Error:', err);
-});
-
-redis.on('connect', () => {
-  console.log('✅ Redis connected');
-});
-
-redis.on('disconnect', () => {
-  console.log('❌ Redis disconnected');
-});
-
-// Connessione lazy
-let isConnected = false;
+// Configurazione Redis per Vercel Serverless
+let redis: any = null;
 
 export async function getRedisClient() {
-  if (!isConnected) {
+  if (!redis) {
+    redis = createClient({
+      url: process.env.REDIS_URL || 'redis://localhost:6379',
+      socket: {
+        connectTimeout: 10000,
+      },
+    });
+
+    redis.on('error', (err: any) => {
+      console.error('Redis Client Error:', err);
+    });
+
+    redis.on('connect', () => {
+      console.log('✅ Redis connected');
+    });
+  }
+
+  if (!redis.isOpen) {
     try {
       await redis.connect();
-      isConnected = true;
     } catch (error) {
       console.error('Failed to connect to Redis:', error);
       throw new Error('Redis connection failed');
     }
   }
+
   return redis;
 }
 
