@@ -30,7 +30,7 @@ export default async function handler(
     }
 
     // Parse dei dati
-    const dropData: DropData = JSON.parse(rawData);
+    const dropData: DropData = JSON.parse(rawData as string);
 
     // Decrementa le visualizzazioni rimanenti
     dropData.remainingViews -= 1;
@@ -43,7 +43,7 @@ export default async function handler(
       // Mantieni il TTL originale
       const ttl = await redis.ttl(key);
       if (ttl > 0) {
-        await redis.setEx(key, ttl, JSON.stringify(dropData));
+        await redis.setex(key, ttl, JSON.stringify(dropData));
       }
     }
 
