@@ -141,8 +141,8 @@ export default async function handler(
     }
 
     // Save to Redis with calculated TTL
-    const redis = await getRedisClient();
-    await redis.setEx(key, ttl, JSON.stringify(dropData));
+    const redis = getRedisClient();
+    await redis.setex(key, ttl, JSON.stringify(dropData));
 
     const ttlHours = Math.round(ttl / 3600 * 10) / 10; // Round to 1 decimal
     console.log(`✅ Drop created: ${id} (expires in ${ttlHours}h, 1 view max${burnTimer ? `, burn timer: ${burnTimer}s` : ''})`);

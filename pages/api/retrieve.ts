@@ -19,7 +19,7 @@ export default async function handler(
   }
 
   try {
-    const redis = await getRedisClient();
+    const redis = getRedisClient();
     const key = getDropKey(id);
 
     // Recupera dati da Redis

@@ -48,7 +48,7 @@ export default async function handler(
       });
     }
 
-    const redis = await getRedisClient();
+    const redis = getRedisClient();
     const key = `drop:${id}`;
 
     // Get encrypted data from Redis
@@ -62,7 +62,7 @@ export default async function handler(
     }
 
     // Parse encrypted drop data
-    const dropData: EncryptedDropData = JSON.parse(rawData);
+    const dropData: EncryptedDropData = JSON.parse(rawData as string);
 
     // 🛡️ Check if drop has too many failed attempts
     if (dropData.failedAttempts && dropData.failedAttempts >= MAX_FAILED_ATTEMPTS) {
@@ -87,7 +87,7 @@ export default async function handler(
       // Update with decremented views, preserve TTL
       const ttl = await redis.ttl(key);
       if (ttl > 0) {
-        await redis.setEx(key, ttl, JSON.stringify(dropData));
+        await redis.setex(key, ttl, JSON.stringify(dropData));
       }
     }
 

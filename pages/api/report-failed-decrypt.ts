@@ -48,7 +48,7 @@ export default async function handler(
       });
     }
 
-    const redis = await getRedisClient();
+    const redis = getRedisClient();
     const key = `drop:${id}`;
 
     // Get current drop data
