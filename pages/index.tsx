@@ -55,10 +55,10 @@ export default function LandingPage() {
             </span>
           </h1>
           
-          {/* By Noctivaga Project */}
+          {/* By Noctivaga */}
           <div className="flex items-center justify-center space-x-3 mb-8">
             <p className="text-sm md:text-base text-gray-400 uppercase tracking-widest font-light">
-              By Noctivaga Project
+              By Noctivaga
             </p>
             <a 
               href="https://x.com/nctvga" 

@@ -132,7 +132,7 @@ export default function DropPage() {
             Educational Use Only
           </p>
                       <div className="flex items-center justify-center space-x-2 mt-1">
-              <p className="text-gray-600 text-xs">By Noctivaga Project</p>
+              <p className="text-gray-600 text-xs">By Noctivaga</p>
               <a 
                 href="https://x.com/nctvga" 
                 target="_blank" 
