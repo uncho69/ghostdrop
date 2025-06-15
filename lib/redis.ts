@@ -1,9 +1,9 @@
-import { createClient } from 'redis';
+import { Redis } from '@upstash/redis'
 
-// 🔒 SECURE REDIS CONFIGURATION - No hardcoded credentials
-// 🚀 FORCE DEPLOY: Fixed Upstash URL configuration
-// 🔥 CACHE BUSTER: 2025-06-15T18:35:00Z - Force complete rebuild
-let redis: any = null;
+// 🔒 SECURE REDIS CONFIGURATION - Upstash Redis Client
+// 🚀 FORCE DEPLOY: Complete rewrite for Upstash v3
+// 🔥 CACHE BUSTER: 2025-06-15T20:00:00Z - Force complete rebuild
+let redisClient: Redis | null = null;
 
 // 🛡️ Secure logging configuration
 const ENABLE_REDIS_LOGS = process.env.ENABLE_REDIS_LOGS === 'true';
@@ -18,91 +18,65 @@ function secureLog(message: string, data?: any) {
   }
 }
 
-export async function getRedisClient() {
-  secureLog('🔗 getRedisClient: Starting...');
-  
-  if (!redis) {
-    secureLog('🆕 Creating new Redis client...');
-    
-    const redisUrl = process.env.REDIS_URL;
-    const redisHost = process.env.REDIS_HOST;
-    const redisPort = process.env.REDIS_PORT;
-    const redisPassword = process.env.REDIS_PASSWORD;
-    const redisUsername = process.env.REDIS_USERNAME || 'default';
-    
-    if (!redisUrl && !redisHost) {
-      throw new Error('Redis configuration missing: REDIS_URL or REDIS_HOST required');
-    }
-    
-    // 🔧 COMPLETELY NEW UPSTASH LOGIC - Use URL directly
-    if (redisUrl && redisUrl.includes('upstash.io')) {
-      secureLog('🔧 Using Upstash with direct URL connection...');
-      
-      // DIRECT URL CONNECTION - NO SEPARATE PASSWORD NEEDED
-      redis = createClient({
-        url: redisUrl, // This contains everything: redis://user:pass@host:port
-        socket: {
-          tls: true,
-          rejectUnauthorized: false,
-          connectTimeout: 10000,
-        }
-      });
-    } 
-    // 🏠 Local or custom Redis configuration
-    else if (redisHost && redisPort && redisPassword) {
-      secureLog('🏠 Using custom host/port configuration...');
-      redis = createClient({
-        socket: {
-          host: redisHost,
-          port: parseInt(redisPort),
-          tls: redisHost.includes('upstash.io') || redisHost.includes('redis.cloud'),
-          connectTimeout: 10000,
-        },
-        username: redisUsername,
-        password: redisPassword
-      });
-    }
-    // 📍 Fallback to URL configuration
-    else {
-      secureLog('📍 Using URL configuration...');
-      redis = createClient({
-        url: redisUrl || 'redis://localhost:6379',
-        socket: {
-          connectTimeout: 10000,
-        },
-      });
-    }
-
-    redis.on('error', (err: any) => {
-      console.error('💥 Redis Client Error:', err.message); // Only log error message, not full details
-    });
-
-    redis.on('connect', () => {
-      secureLog('✅ Redis connected');
-    });
-    
-    redis.on('ready', () => {
-      secureLog('🚀 Redis ready');
-    });
-    
-    redis.on('end', () => {
-      secureLog('🔚 Redis connection ended');
-    });
+export function getRedisClient(): Redis {
+  if (redisClient) {
+    return redisClient;
   }
 
-  if (!redis.isOpen) {
-    try {
-      secureLog('🔌 Connecting to Redis...');
-      await redis.connect();
-      secureLog('✅ Redis connection established');
-    } catch (error) {
-      console.error('💥 Redis connection failed:', error.message); // Only log error message
-      throw new Error(`Redis connection failed: ${error.message}`);
-    }
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    throw new Error('REDIS_URL environment variable is not set');
   }
 
-  secureLog('🎯 Returning Redis client');
-  return redis;
+  try {
+    // Parse the Redis URL: redis://default:password@host:port
+    const url = new URL(redisUrl);
+    const password = url.password;
+    const hostname = url.hostname;
+    const port = url.port || '6379';
+
+    if (!password) {
+      throw new Error('Password not found in REDIS_URL');
+    }
+
+    if (!hostname) {
+      throw new Error('Hostname not found in REDIS_URL');
+    }
+
+    // For Upstash, we need HTTPS URL and the password as token
+    const upstashUrl = `https://${hostname}:${port}`;
+    
+    secureLog('🔌 Configuring Upstash Redis client', {
+      url: upstashUrl,
+      hasToken: !!password,
+      hostname,
+      port
+    });
+
+    redisClient = new Redis({
+      url: upstashUrl,
+      token: password
+    });
+
+    secureLog('✅ Upstash Redis client configured successfully');
+    return redisClient;
+
+  } catch (error) {
+    console.error('❌ Redis configuration error:', error);
+    throw new Error(`Failed to configure Redis: ${error.message}`);
+  }
+}
+
+export async function testRedisConnection(): Promise<boolean> {
+  try {
+    const client = getRedisClient();
+    await client.ping();
+    console.log('✅ Redis connected');
+    return true;
+  } catch (error) {
+    console.error('❌ Redis connection error:', error);
+    return false;
+  }
 }
 
 // 🔐 Cryptographically secure ID generation
@@ -135,7 +109,7 @@ export function getDropKey(id: string): string {
 // 🛡️ Rate limiting helper
 export async function checkRateLimit(key: string, maxAttempts: number = 5, windowSeconds: number = 300): Promise<{ allowed: boolean; remaining: number }> {
   try {
-    const redis = await getRedisClient();
+    const redis = getRedisClient();
     const current = await redis.incr(key);
     
     if (current === 1) {
@@ -148,9 +122,10 @@ export async function checkRateLimit(key: string, maxAttempts: number = 5, windo
       remaining
     };
   } catch (error) {
+    console.error('Rate limit check error:', error);
     // Fail open for rate limiting to avoid blocking legitimate users
     return { allowed: true, remaining: maxAttempts };
   }
 }
 
-export default redis; 
+export default redisClient; 
