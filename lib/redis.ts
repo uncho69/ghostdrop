@@ -1,8 +1,8 @@
 import { Redis } from '@upstash/redis'
 
 // 🔒 SECURE REDIS CONFIGURATION - Upstash Redis Client
-// 🚀 FORCE DEPLOY: Complete rewrite for Upstash v4
-// 🔥 CACHE BUSTER: 2025-06-15T21:00:00Z - Force complete rebuild
+// 🚀 FORCE DEPLOY: Secure environment variables v5
+// 🔥 CACHE BUSTER: 2025-06-15T22:00:00Z - Force complete rebuild
 let redisClient: Redis | null = null;
 
 // 🛡️ Secure logging configuration
@@ -23,19 +23,25 @@ export function getRedisClient(): Redis {
     return redisClient;
   }
 
+  // Usa le variabili d'ambiente in modo sicuro
   const redisUrl = process.env.REDIS_URL;
+  const redisPassword = process.env.REDIS_PASSWORD;
+  
   if (!redisUrl) {
     throw new Error('REDIS_URL environment variable is not set');
   }
 
+  if (!redisPassword) {
+    throw new Error('REDIS_PASSWORD environment variable is not set');
+  }
+
   try {
-    // Configurazione Upstash con URL e token
-    const token = 'AYaSAAIjcDFhMDgzZDgwYWJiMjk0ODIzOGQyY2YwYTQ3NmM5ZDQ1NHAxMA';
-    const url = 'https://beloved-boa-34450.upstash.io';
+    // Configurazione Upstash sicura con variabili d'ambiente
+    const upstashUrl = 'https://beloved-boa-34450.upstash.io';
 
     redisClient = new Redis({
-      url: url,
-      token: token,
+      url: upstashUrl,
+      token: redisPassword,
     });
 
     secureLog('✅ Redis connected');
