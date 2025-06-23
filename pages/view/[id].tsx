@@ -36,7 +36,7 @@ export default function ViewDrop() {
 
   useEffect(() => {
     async function loadAndDecrypt() {
-      if (!id || typeof id !== 'string') return;
+    if (!id || typeof id !== 'string') return;
 
       try {
         setIsLoading(true);
@@ -68,7 +68,7 @@ export default function ViewDrop() {
         if (response.status === 404) {
           throw new Error('Drop not found or already expired');
         }
-
+        
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Failed to retrieve drop: ${errorText}`);
@@ -89,7 +89,7 @@ export default function ViewDrop() {
           salt: result.data.salt,
           version: result.data.version || '1.0'
         };
-
+          
         // 🔓 CRITICAL: Decrypt data client-side
         let decryptedJson: string;
         let dropData: DropData;
@@ -382,7 +382,7 @@ export default function ViewDrop() {
       }}></div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
-        {/* Header */}
+      {/* Header */}
         <div className="text-center mb-12">
           <div className="text-6xl mb-4">👻</div>
           <h1 className="text-3xl font-bold mb-2 text-green-400 uppercase tracking-wider">GHOST REVEALED</h1>
@@ -416,14 +416,14 @@ export default function ViewDrop() {
                 </p>
                 <p className="text-sm text-gray-400 mb-6">
                   {(decryptedContent.file.size / 1024 / 1024).toFixed(2)} MB • {decryptedContent.file.type || 'Unknown type'}
-                </p>
-                <button
+              </p>
+              <button
                   onClick={() => downloadFile(decryptedContent.file)}
                   className="bg-blue-500 hover:bg-blue-600 text-black font-bold py-3 px-8 rounded-lg uppercase tracking-wider transition-colors"
-                >
+              >
                   💾 Download File
-                </button>
-              </div>
+              </button>
+            </div>
             </>
           ) : null}
         </div>
@@ -434,7 +434,7 @@ export default function ViewDrop() {
             <div className="text-4xl mb-4">⏰</div>
             <div className="text-3xl font-bold text-red-400 mb-2">
               {countdown}
-            </div>
+                </div>
             <p className="text-red-300 text-sm uppercase tracking-wider">
               Seconds until destruction
             </p>
@@ -445,10 +445,10 @@ export default function ViewDrop() {
                   width: `${initialBurnTimer > 0 ? (countdown / initialBurnTimer) * 100 : 0}%` 
                 }}
               />
-            </div>
-          </div>
-        )}
-
+                  </div>
+                </div>
+              )}
+              
         {/* Actions */}
         <div className="text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -462,8 +462,8 @@ export default function ViewDrop() {
               href="/drop" 
               className="inline-block bg-blue-500 hover:bg-blue-600 text-black font-bold py-3 px-6 rounded-lg uppercase tracking-wider transition-colors"
             >
-              Create New Drop
-            </Link>
+                Create New Drop
+              </Link>
             {/* 🔥 NEW: Manual Destroy Button */}
             <button
               onClick={destroyNow}
@@ -471,7 +471,7 @@ export default function ViewDrop() {
             >
               💥 Destroy Now
             </button>
-          </div>
+            </div>
         </div>
       </div>
     </div>

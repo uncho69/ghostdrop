@@ -15,14 +15,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const isValid = await validateAndMarkCode(accessCode);
 
-    if (isValid) {
+  if (isValid) {
       // Set session cookie with the code for later expiry after drop creation
       res.setHeader('Set-Cookie', `ghostdrop-access=${accessCode.toUpperCase()}; HttpOnly; Path=/; Max-Age=3600; SameSite=Strict`);
       return res.status(200).json({ 
         success: true, 
         message: 'Access granted - code marked as used and valid until drop creation' 
       });
-    } else {
+  } else {
       return res.status(401).json({ error: 'Invalid, expired, or already used access code' });
     }
   } catch (error) {

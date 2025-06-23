@@ -97,24 +97,24 @@ export async function encryptData(data: string, password: string): Promise<Encry
   
   try {
     // Derive encryption key using PBKDF2
-    const key = await deriveKey(password, salt);
-    
+  const key = await deriveKey(password, salt);
+  
     // Encrypt with AES-256-GCM (provides authentication)
-    const encryptedBuffer = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: iv },
-      key,
-      dataBuffer
-    );
-    
+  const encryptedBuffer = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    dataBuffer
+  );
+  
     // Secure base64 encoding
-    const encryptedArray = new Uint8Array(encryptedBuffer);
-    
-    return {
-      encryptedData: arrayBufferToBase64(encryptedArray),
+  const encryptedArray = new Uint8Array(encryptedBuffer);
+  
+  return {
+    encryptedData: arrayBufferToBase64(encryptedArray),
       iv: arrayBufferToBase64(iv),
       salt: arrayBufferToBase64(salt),
       version: CRYPTO_VERSION
-    };
+  };
   } catch (error) {
     throw new Error(`Encryption failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -138,10 +138,10 @@ export async function decryptData(encryptedData: EncryptedData, password: string
 
   try {
     // Decode from base64
-    const encryptedBuffer = Uint8Array.from(atob(encryptedData.encryptedData), c => c.charCodeAt(0));
-    const iv = Uint8Array.from(atob(encryptedData.iv), c => c.charCodeAt(0));
-    const salt = Uint8Array.from(atob(encryptedData.salt), c => c.charCodeAt(0));
-    
+  const encryptedBuffer = Uint8Array.from(atob(encryptedData.encryptedData), c => c.charCodeAt(0));
+  const iv = Uint8Array.from(atob(encryptedData.iv), c => c.charCodeAt(0));
+  const salt = Uint8Array.from(atob(encryptedData.salt), c => c.charCodeAt(0));
+  
     // Validate lengths
     if (iv.length !== IV_LENGTH) {
       throw new Error('Invalid IV length');
@@ -152,17 +152,17 @@ export async function decryptData(encryptedData: EncryptedData, password: string
     }
     
     // Derive decryption key
-    const key = await deriveKey(password, salt);
-    
+  const key = await deriveKey(password, salt);
+  
     // Decrypt with authentication verification
-    const decryptedBuffer = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: iv },
-      key,
-      encryptedBuffer
-    );
-    
-    const decoder = new TextDecoder();
-    return decoder.decode(decryptedBuffer);
+  const decryptedBuffer = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    encryptedBuffer
+  );
+  
+  const decoder = new TextDecoder();
+  return decoder.decode(decryptedBuffer);
     
   } catch (error) {
     // Don't leak specific error details for security
@@ -192,14 +192,14 @@ export function fileToBase64(file: File, maxSizeMB: number = 25): Promise<string
     
     reader.onload = () => {
       try {
-        const result = reader.result as string;
+      const result = reader.result as string;
         // Remove data:type;base64, prefix
-        const base64 = result.split(',')[1];
+      const base64 = result.split(',')[1];
         if (!base64) {
           reject(new Error('Failed to convert file to base64'));
           return;
         }
-        resolve(base64);
+      resolve(base64);
       } catch (error) {
         reject(new Error('File processing failed'));
       }

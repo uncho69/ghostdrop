@@ -3,7 +3,7 @@ import { generateSingleUseCode } from '../../../lib/access-codes';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('🔧 Admin generate-code API called');
-  
+
   if (req.method !== 'POST') {
     console.log('❌ Method not allowed:', req.method);
     return res.status(405).json({ error: 'Method not allowed' });
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const code = await Promise.race([codePromise, timeoutPromise]);
     
     console.log('✅ Code generated successfully:', code);
-    
+
     return res.status(200).json({
       success: true,
       code,

@@ -41,7 +41,7 @@ export default function DropPage() {
 
     // Only run when router is ready
     if (router.isReady) {
-      checkAccess();
+    checkAccess();
     }
   }, [router.isReady, router.query.access]);
 
