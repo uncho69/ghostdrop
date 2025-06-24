@@ -266,18 +266,71 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-800 py-8 px-4 bg-black">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-500 text-sm uppercase tracking-wider">
-            Open Source • Privacy First • No Tracking
-          </p>
-          <p className="text-gray-500 text-xs mt-2 font-mono">
-            FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY
-          </p>
-          <p className="text-gray-600 text-xs mt-1">
-            Users are responsible for compliance with local laws • © 2025 GHOSTDROP
-          </p>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-6">
+            <p className="text-gray-500 text-sm uppercase tracking-wider">
+              Open Source • Privacy First • No Tracking
+            </p>
+            <p className="text-gray-500 text-xs mt-2 font-mono">
+              FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY
+            </p>
+            <p className="text-gray-600 text-xs mt-1">
+              Users are responsible for compliance with local laws • © 2025 GHOSTDROP
+            </p>
+          </div>
+          
+          {/* Support & Donations Section */}
+          <div className="text-center pt-12 space-y-6">
+            
+            {/* Support */}
+            <div>
+              <p className="text-gray-400 text-sm mb-2 font-mono uppercase tracking-wider">
+                Need Support?
+              </p>
+              <a 
+                href="mailto:ghostdrop@tutamail.com"
+                className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors duration-200 text-sm font-mono"
+              >
+                <span className="text-lg">📧</span>
+                <span>ghostdrop@tutamail.com</span>
+              </a>
+            </div>
+
+            {/* Donations */}
+            <div>
+              <p className="text-gray-400 text-sm mb-2 font-mono uppercase tracking-wider">
+                Support The Project
+              </p>
+              <p className="text-gray-500 text-xs mb-3 max-w-md mx-auto">
+                We build privacy-focused apps and release them for free. Support development if you find GhostDrop useful.
+              </p>
+              <div className="inline-flex items-center space-x-2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
+                <span className="text-lg">⟐</span>
+                <span className="text-green-400 font-mono text-xs">0xF76aBc4583A9373e3416e75d9043d4A26a80a00F</span>
+                <button 
+                  onClick={() => navigator.clipboard.writeText('0xF76aBc4583A9373e3416e75d9043d4A26a80a00F')}
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-xs"
+                  title="Copy ETH address"
+                >
+                  📋
+                </button>
+              </div>
+            </div>
+
+          </div>
         </div>
       </footer>
+
+      {/* Floating Support Button - Mobile Only */}
+      <div className="fixed bottom-6 right-6 md:hidden z-50">
+        <a 
+          href="mailto:ghostdrop@tutamail.com"
+          className="w-14 h-14 bg-blue-500 hover:bg-blue-600 text-black rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+          title="Support: ghostdrop@tutamail.com"
+        >
+          <span className="text-xl">📧</span>
+        </a>
+      </div>
     </div>
   );
 } 
