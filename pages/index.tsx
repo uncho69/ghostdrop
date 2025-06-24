@@ -24,7 +24,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-mono">
+    <div className="min-h-screen bg-black text-white font-mono overflow-x-hidden">
       <Head>
         <title>GHOSTDROP</title>
         <meta name="description" content="Secure, ephemeral file & message sharing. No accounts. No tracking." />
