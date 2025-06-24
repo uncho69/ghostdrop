@@ -321,16 +321,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Floating Support Button - Mobile Only */}
-      <div className="fixed bottom-6 right-6 md:hidden z-50">
-        <a 
-          href="mailto:ghostdrop@tutamail.com"
-          className="w-14 h-14 bg-blue-500 hover:bg-blue-600 text-black rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
-          title="Support: ghostdrop@tutamail.com"
-        >
-          <span className="text-xl">📧</span>
-        </a>
-      </div>
+
     </div>
   );
 } 
