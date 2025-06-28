@@ -18,9 +18,6 @@ export default function LegalPage() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
-                <span className="text-black font-bold text-sm">👻</span>
-              </div>
               <span className="text-xl font-bold tracking-wider">GHOSTDROP</span>
             </Link>
             
@@ -41,7 +38,7 @@ export default function LegalPage() {
           {/* Title */}
           <div className="text-center border-b border-gray-800 pb-8">
             <h1 className="text-4xl font-bold mb-4 text-blue-400 tracking-wider">
-              📄 GHOSTDROP
+              GHOSTDROP
             </h1>
             <h2 className="text-2xl font-bold mb-2 text-gray-100">
               Privacy & Terms of Use
@@ -122,33 +119,15 @@ export default function LegalPage() {
                   <span className="text-red-400 mt-1">•</span>
                   <span>Attempting to overload, exploit, or reverse-engineer the service</span>
                 </li>
+                <li className="flex items-start space-x-3">
+                  <span className="text-red-400 mt-1">•</span>
+                  <span>Sharing screenshots of your crypto portfolio to flex on your broke friends</span>
+                </li>
               </ul>
             </div>
           </section>
 
-          {/* Abuse & Enforcement */}
-          <section className="space-y-4">
-            <h3 className="text-2xl font-bold text-orange-400 flex items-center space-x-3">
-              <span>🛡️</span>
-              <span>Abuse & Enforcement</span>
-            </h3>
-            
-            <div className="bg-orange-900/10 border border-orange-500/30 rounded-lg p-6">
-              <p className="text-gray-300 mb-4">
-                While we cannot see the content shared via GhostDrop, we reserve the right to:
-              </p>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start space-x-3">
-                  <span className="text-orange-400 mt-1">•</span>
-                  <span>Limit or suspend access (e.g. by IP) in case of detected abuse patterns, excessive traffic, or denial-of-service attempts</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <span className="text-orange-400 mt-1">•</span>
-                  <span>Comply with valid legal requests, even though we typically have no decryptable information to provide</span>
-                </li>
-              </ul>
-            </div>
-          </section>
+
 
           {/* Transparency & Changes */}
           <section className="space-y-4">
@@ -215,7 +194,6 @@ export default function LegalPage() {
             href="/" 
             className="inline-flex items-center space-x-2 px-6 py-3 border border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-black transition-all duration-300 rounded-lg font-bold uppercase tracking-wider"
           >
-            <span>👻</span>
             <span>Back to GhostDrop</span>
           </Link>
         </div>
