@@ -1,7 +1,7 @@
 import { Redis } from '@upstash/redis'
 
 // 🔒 SECURE REDIS CONFIGURATION - Upstash Redis Client
-// 🚀 FORCE DEPLOY v7: JSON parsing fix + syntax errors resolved
+// 🚀 Configured for ghostdrop.org deployment
 // 🔥 CACHE BUSTER: 2025-06-15T22:30:00Z - Complete rebuild with all fixes
 // ✅ BUILD VERIFIED: Local build successful, ready for Vercel
 let redisClient: Redis | null = null;
@@ -24,7 +24,7 @@ export function getRedisClient(): Redis {
     return redisClient;
   }
 
-  // Usa le variabili d'ambiente in modo sicuro
+  // Use environment variables for secure configuration
   const redisUrl = process.env.REDIS_URL;
   const redisPassword = process.env.REDIS_PASSWORD;
   
@@ -37,15 +37,13 @@ export function getRedisClient(): Redis {
   }
 
   try {
-    // Configurazione Upstash sicura con variabili d'ambiente
-    const upstashUrl = 'https://beloved-boa-34450.upstash.io';
-
+    // Secure Upstash configuration with environment variables
     redisClient = new Redis({
-      url: upstashUrl,
+      url: redisUrl,
       token: redisPassword,
     });
 
-    secureLog('✅ Redis connected');
+    secureLog('✅ Redis connected to ghostdrop.org');
     return redisClient;
   } catch (error) {
     secureLog('❌ Redis connection failed:', error);

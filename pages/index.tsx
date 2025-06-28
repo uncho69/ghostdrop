@@ -6,6 +6,7 @@ import AccessGate from '../components/AccessGate';
 
 export default function LandingPage() {
   const [showAccessGate, setShowAccessGate] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
   const router = useRouter();
 
   const handleEnterApp = () => {
@@ -264,63 +265,104 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800 py-8 px-4 bg-black">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-6">
+      {/* Footer - Compact & Integrated */}
+      <footer className="border-t border-gray-800 py-6 px-4 bg-black/95">
+        <div className="max-w-4xl mx-auto space-y-4">
+          
+          {/* Main Footer Info */}
+          <div className="text-center">
             <p className="text-gray-500 text-sm uppercase tracking-wider">
               Open Source • Privacy First • No Tracking
             </p>
-            <p className="text-gray-500 text-xs mt-2 font-mono">
-              FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY
-            </p>
-            <p className="text-gray-600 text-xs mt-1">
-              Users are responsible for compliance with local laws • © 2025 GHOSTDROP
-            </p>
-          </div>
-          
-          {/* Support & Donations Section */}
-          <div className="text-center pt-12 space-y-6">
-            
-            {/* Support */}
-            <div>
-              <p className="text-gray-400 text-sm mb-2 font-mono uppercase tracking-wider">
-                Need Support?
-              </p>
-              <a 
-                href="mailto:ghostdrop@tutamail.com"
-                className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors duration-200 text-sm font-mono"
+            <div className="mt-2 flex items-center justify-center space-x-3 text-xs">
+              <a href="/legal" className="text-gray-500 hover:text-blue-400 transition-colors">Privacy & Terms</a>
+              <span className="text-gray-700">•</span>
+              <button 
+                onClick={() => setShowSupportModal(true)} 
+                className="text-gray-500 hover:text-blue-400 transition-colors"
               >
-                <span className="text-lg">📧</span>
-                <span>ghostdrop@tutamail.com</span>
-              </a>
+                App Support
+              </button>
             </div>
-
-            {/* Donations */}
-            <div>
-              <p className="text-gray-400 text-sm mb-2 font-mono uppercase tracking-wider">
-                Support The Project
-              </p>
-              <p className="text-gray-500 text-xs mb-3 max-w-md mx-auto">
-                We build privacy-focused apps and release them for free. Support development if you find GhostDrop useful.
-              </p>
-              <div className="inline-flex items-center space-x-2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
-                <span className="text-lg">⟐</span>
-                <span className="text-green-400 font-mono text-xs">0xF76aBc4583A9373e3416e75d9043d4A26a80a00F</span>
-                <button 
-                  onClick={() => navigator.clipboard.writeText('0xF76aBc4583A9373e3416e75d9043d4A26a80a00F')}
-                  className="text-gray-400 hover:text-white transition-colors duration-200 text-xs"
-                  title="Copy ETH address"
-                >
-                  📋
-                </button>
-              </div>
-            </div>
-
           </div>
+
+          {/* Compact Donation */}
+          <div className="text-center">
+            <p className="text-gray-600 text-xs mb-2">Support development:</p>
+            <div className="inline-flex items-center space-x-2 bg-gray-900/50 border border-gray-800 rounded px-3 py-1">
+              <span className="text-sm">⟐</span>
+              <span className="text-green-400 font-mono text-xs">0xF76aBc4583A9373e3416e75d9043d4A26a80a00F</span>
+              <button 
+                onClick={() => navigator.clipboard.writeText('0xF76aBc4583A9373e3416e75d9043d4A26a80a00F')}
+                className="text-gray-500 hover:text-white transition-colors text-xs"
+                title="Copy ETH address"
+              >
+                📋
+              </button>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center">
+            <p className="text-gray-600 text-xs">
+              Educational use only • © 2025 GHOSTDROP
+            </p>
+          </div>
+
         </div>
       </footer>
 
+      {/* Support Modal - Privacy-First */}
+      {showSupportModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-lg p-8 max-w-md w-full relative">
+            {/* Close Button */}
+            <button 
+              onClick={() => setShowSupportModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+            
+            {/* Header */}
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-bold text-blue-400 mb-2 font-mono">APP SUPPORT</h3>
+            </div>
+            
+                         {/* Email Section */}
+             <div className="space-y-4">
+               
+               <div className="bg-black/50 border border-gray-700 rounded p-4 flex items-center justify-between">
+                 <span className="text-blue-400 font-mono text-sm">ghostdrop@tutamail.com</span>
+                 <button 
+                   onClick={() => {
+                     navigator.clipboard.writeText('ghostdrop@tutamail.com');
+                     // Optional: show copied feedback
+                   }}
+                   className="text-gray-400 hover:text-white transition-colors ml-3"
+                   title="Copy email"
+                 >
+                   📋
+                 </button>
+               </div>
+               
+               <div className="text-xs text-gray-500">
+                 <p>• <strong>Response time:</strong> Within 24-48 hours</p>
+               </div>
+             </div>
+             
+             {/* Close Button */}
+             <div className="mt-6 text-center">
+               <button 
+                 onClick={() => setShowSupportModal(false)}
+                 className="px-6 py-2 bg-blue-500 text-black font-bold rounded hover:bg-blue-600 transition-colors"
+               >
+                 Close
+               </button>
+             </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

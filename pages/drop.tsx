@@ -131,26 +131,7 @@ export default function DropPage() {
           <p className="text-gray-500 text-xs mt-2 font-mono">
             Educational Use Only
           </p>
-                      <div className="flex items-center justify-center space-x-2 mt-1">
-              <p className="text-gray-600 text-xs">By Noctivaga</p>
-              <a 
-                href="https://x.com/nctvga" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-500 hover:text-blue-400 transition-colors duration-200"
-                aria-label="Follow Noctivaga on X"
-              >
-                <svg 
-                  width="14" 
-                  height="14" 
-                  viewBox="0 0 24 24" 
-                  fill="currentColor"
-                  className="hover:scale-110 transition-transform duration-200"
-                >
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-              </a>
-            </div>
+            
         </div>
       </footer>
     </div>

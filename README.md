@@ -1,8 +1,66 @@
-# 👻 GHOSTDROP
+# 👻 GhostDrop
 
-**Secure, ephemeral file & message sharing with zero-knowledge encryption**
+**Zero-knowledge file sharing with military-grade encryption**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/uncho69/ghostdrop)
+🔗 **Live Demo:** [ghostdrop.org](https://ghostdrop.org)
+
+## 🚀 Quick Deploy to ghostdrop.org
+
+### 1. Environment Setup
+```bash
+# Copy environment template
+cp env.example .env.production
+
+# Update with your domain (already configured for ghostdrop.org)
+NEXT_PUBLIC_SITE_URL=https://ghostdrop.org
+```
+
+### 2. Build & Deploy
+```bash
+npm install
+npm run build
+npm start
+```
+
+### 3. Admin Panel
+Access admin panel at: `https://ghostdrop.org/admin-codes`
+
+## 🛡️ Security Features
+
+- **AES-256-GCM** encryption with PBKDF2 (210k iterations)
+- **Zero-knowledge** architecture - server never sees your keys
+- **Auto-destruction** after first access or expiry
+- **Enterprise-grade** security headers
+- **Admin dashboard** with usage analytics
+
+## 🔧 Configuration
+
+The app is pre-configured for **ghostdrop.org** deployment. Just update your Redis credentials in `.env.production`:
+
+```bash
+REDIS_URL=your-redis-connection-string
+```
+
+## 📊 Features
+
+- ✅ File & text sharing (up to 10MB)
+- ✅ Password protection (optional)
+- ✅ Custom expiry times
+- ✅ Access code system
+- ✅ Admin dashboard
+- ✅ Mobile responsive
+- ✅ PWA ready
+
+## 🏗️ Tech Stack
+
+- **Next.js 14** + React 18 + TypeScript
+- **Redis** for secure storage
+- **WebCrypto API** for client-side encryption
+- **Tailwind CSS** for styling
+
+---
+
+**Built for ghostdrop.org** - Enterprise-grade secure file sharing
 
 ## 🔥 Features
 

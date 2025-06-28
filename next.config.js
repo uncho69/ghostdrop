@@ -5,9 +5,11 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false, // 🚫 Disable React Strict Mode to prevent Fast Refresh issues
   swcMinify: true,
   poweredByHeader: false, // Hide Next.js signature for security
+  
+
   
   // 🔒 Enterprise-grade security headers
   async headers() {
@@ -176,6 +178,25 @@ const nextConfig = {
       };
     }
     
+    // 🚫 KILL Fast Refresh completely - no more infinite loops!
+    if (dev) {
+      config.watchOptions = {
+        poll: false,
+        ignored: /node_modules/,
+        aggregateTimeout: 5000, // Longer timeout
+      };
+      // Disable ALL caching and Fast Refresh
+      config.cache = false;
+      config.infrastructureLogging = { level: 'error' };
+      
+      // Nuclear option: disable HMR completely
+      config.devServer = {
+        ...config.devServer,
+        hot: false,
+        liveReload: false,
+      };
+    }
+    
     // Production security optimizations
     if (!dev) {
       config.optimization.minimize = true;
@@ -195,7 +216,16 @@ const nextConfig = {
   // 🔒 Experimental security features
   experimental: {
     serverComponentsExternalPackages: ['redis']
-  }
+  },
+
+  // 🚫 NUCLEAR OPTION: Disable Fast Refresh completely
+  ...(process.env.NODE_ENV === 'development' && {
+    compiler: {
+      reactRemoveProperties: false,
+    },
+    // Disable Fast Refresh at Next.js level
+    fastRefresh: false,
+  })
 };
 
 module.exports = nextConfig; 
